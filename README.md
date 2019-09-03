@@ -1,5 +1,5 @@
 # About
-This repository provides the code for ‘Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models’. 
+This repository provides the code for **‘Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models’**. 
 # Dependencies
 * Python 3
 * numpy
