@@ -72,7 +72,7 @@ global_train_parser.add_argument(
     '-stop_threshold',
     default = float('inf'),
     type=float,
-    help='threshold for early stopping (set as 0.99 in the paper; (default:  inf (= disable early stopping)')
+    help='threshold for early stopping (set as 0.99 in the paper; default:  inf (= disable early stopping)')
 
 global_train_parser.add_argument(
     '-remove_models',
