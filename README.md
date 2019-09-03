@@ -43,7 +43,7 @@ This code produces `'frdeen_params.txt', 'frdeen_epochX.model' (X = epoch size),
 python align_words.py -dict fr-de -src result/frdeen.lang0.vec -tgt result/frdeen.lang1.vec -save save_name
 ```
 
-**This code aligns pairs of words in a 'fr-de' dictionary using CSLS** and saves the result as 'save_name'. Note that **_this evaluation is different from another evaluation method called 'Bilingual Lexicon Induction'_**, which extracts target words from the target vocabulary table for each source word.  
+**This code aligns pairs of words in a 'fr-de' dictionary using CSLS** and saves the result as 'save_name'. Note that **_this evaluation is different from another evaluation method called 'Bilingual Lexicon Induction'_**, which extracts similar target words to each source word from the whole target vocabulary. 
 
 
 # Reference
