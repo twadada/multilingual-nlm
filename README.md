@@ -23,7 +23,7 @@ python -train train.fr train.de train.en -V_min_freq 5 5 3  -save_name frdeen
 python train.py -data frdeen -gpuid 1 -save_dir result -stop_threshold 0.99 -batch_size 64 -epoch_size 10 -opt_type SGD -learning_rate 1.0 -n_layer 2 -emb_size 300 -h_size 300 -remove_models
 ```
 
-**However, the following options empirically yield better embeddings at the expense of the training speed.**
+However, **the following options empirically yield better embeddings** at the expense of the training speed.
 
 ```
 python train.py -data frdeen -gpuid 1 -save_dir result -batch_size 32 -epoch_size 30 -opt_type ASGD -learning_rate 5.0 -n_layer 2 -emb_size 300 -h_size 300 -remove_models 
@@ -31,7 +31,8 @@ python train.py -data frdeen -gpuid 1 -save_dir result -batch_size 32 -epoch_siz
 
 For the different-domain conditions (1M sentences for each language), we set the 'h_size' as 1024 in our paper. 
  
-This code produces `'frdeen_params.txt', 'frdeen_epochX.model' (X = epoch size), and 'frdeen.lang{0,1,2}.vec'` in the 'result' directory. The first text file describes the options used in train.py and preprocess.py. The second file saves trained Multilingual Neural Language Models, and the last files are multilingual word embeddings for lang0 (fr), 1 (de), and 2 (en). 
+
+This code produces `'frdeen_params.txt', 'frdeen_epochX.model' (X = epoch size), and 'frdeen.lang{0,1,2}.vec'` in the 'result' directory. The first text file describes the options used in train.py and preprocess.py. The second file saves trained Multilingual Neural Language Models, and **the last files are multilingual word embeddings for lang0 (fr), 1 (de), and 2 (en).**
 
 
 ## Evaluation
@@ -42,7 +43,7 @@ This code produces `'frdeen_params.txt', 'frdeen_epochX.model' (X = epoch size),
 python align_words.py -dict fr-de -src result/frdeen.lang0.vec -tgt result/frdeen.lang1.vec -save save_name
 ```
 
-**This code aligns pairs of words in a 'fr-de' dictionary using CSLS and saves the result as 'save_name'**. Note that **this evaluation is different from another evaluation method called 'Bilingual Word Induction'**, which extracts target words from the target vocabulary table for each source word.  
+**This code aligns pairs of words in a 'fr-de' dictionary using CSLS and saves the result as 'save_name'**. Note that **_this evaluation is different from another evaluation method called 'Bilingual Word Induction'_**, which extracts target words from the target vocabulary table for each source word.  
 
 
 # Reference
