@@ -58,15 +58,15 @@ global_train_parser.add_argument(
 
 global_train_parser.add_argument(
     '-opt_type',
-    default="SGD",
+    default="ASGD",
     choices=['SGD', 'ASGD'],
     help='optimizer (SGD or ASGD) (default: ASGD)')
 
 global_train_parser.add_argument(
     '-learning_rate',
-    default=7.0,
+    default=5.0,
     type=float,
-    help='learning rate (default: 7.0)')
+    help='learning rate (default: 5.0)')
 
 global_train_parser.add_argument(
     '-stop_threshold',
