@@ -17,7 +17,7 @@ python train.py -data frdeen -gpuid 1 -n_layer 2  -emb_size 300 -h_size 300 -bat
 
 However, the following options empirically yield better embeddings at the expense of the training speed. 
 
-`python train.py -data frdeen -gpuid 1 -n_layer 2  -emb_size 300 -h_size 300 -batch_size 32 -epoch_size 30  -opt_type ASGD  -learning_rate 5.0 -remove_models -save_dir dir_name`
+```python train.py -data frdeen -gpuid 1 -n_layer 2  -emb_size 300 -h_size 300 -batch_size 32 -epoch_size 30  -opt_type ASGD  -learning_rate 5.0 -remove_models -save_dir dir_name```
 
 For the different-domain conditions (1M sentences for each language), we set the 'h_size' as 1024. 
  
