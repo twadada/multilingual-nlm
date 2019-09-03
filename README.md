@@ -40,10 +40,10 @@ This code produces `'frdeen_params.txt', 'frdeen_epochX.model' (X = epoch size),
 **You can run align_words.py to evaluate multilingual embeddings on a word alignment task.**
 
 ```
-python align_words.py -dict fr-de -src result/frdeen.lang0.vec -tgt result/frdeen.lang1.vec -save save_name
+python align_words.py -dict dict_path -src result/frdeen.lang0.vec -tgt result/frdeen.lang1.vec -save save_name
 ```
 
-**This code aligns pairs of words in a 'fr-de' dictionary using CSLS** and saves the result as 'save_name'. Note that **_this evaluation is different from another evaluation method called 'Bilingual Lexicon Induction'_**, which extracts similar target words to each source word from the whole target vocabulary. 
+**This code aligns pairs of words in a dictionary at 'dict_path' using CSLS** and saves the result as 'save_name'. Note that **_this evaluation is different from another evaluation method called 'Bilingual Lexicon Induction'_**, which extracts similar target words to each source word from the whole target vocabulary. 
 
 
 # Reference
