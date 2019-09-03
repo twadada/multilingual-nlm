@@ -72,12 +72,12 @@ global_train_parser.add_argument(
     '-stop_threshold',
     default = float('inf'),
     type=float,
-    help='threshold for early stopping (set as 0.99 in the paper; (default:  inf (disabled)')
+    help='threshold for early stopping (set as 0.99 in the paper; (default:  inf (= disable early stopping)')
 
 global_train_parser.add_argument(
     '-remove_models',
     action='store_true',
-    help='Only save the model at the last epoch (default: not enabled)')
+    help='Only save the model at the last epoch (default: disabled)')
 
 global_train_parser.add_argument(
     '-seed',
