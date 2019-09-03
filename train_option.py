@@ -77,7 +77,7 @@ global_train_parser.add_argument(
 global_train_parser.add_argument(
     '-remove_models',
     action='store_true',
-    help='only keep the model that has achieved the best perplexity on the development data (default: false)')
+    help='Only save the model at the last epoch (default: not enabled)')
 
 global_train_parser.add_argument(
     '-seed',
