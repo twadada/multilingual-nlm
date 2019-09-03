@@ -48,7 +48,7 @@ global_train_parser.add_argument(
     '-save_dir',
     type=str,
     required=True,
-    help="directory to save models and embeddings")
+    help="directory where models and embeddings are saved")
 
 global_train_parser.add_argument(
     '-data',
@@ -77,7 +77,7 @@ global_train_parser.add_argument(
 global_train_parser.add_argument(
     '-remove_models',
     action='store_true',
-    help='Only save the model at the last epoch (default: disabled)')
+    help='only save the model at the last epoch (default: disabled)')
 
 global_train_parser.add_argument(
     '-seed',
