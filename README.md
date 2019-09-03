@@ -20,13 +20,13 @@ It builds vocabularies that include words used at least 5, 5, and 3 times in 'tr
 After preprocessing, you can run train.py to obtain multilingual embeddings. Use the name of the data saved in preprocessing (frdeen) for the '-data' argument. In our paper, we used the following options for the low-resource conditions (50k sentences for each language). 
 
 ```
-python train.py -data frdeen -gpuid 1 -n_layer 2  -emb_size 300 -h_size 300 -remove_models  -save_dir result -stop_threshold 0.99 -batch_size 64 -epoch_size 10  -opt_type SGD  -learning_rate 1.0 
+python train.py -data frdeen -gpuid 1 -save_dir result -stop_threshold 0.99 -batch_size 64 -epoch_size 10 -opt_type SGD -learning_rate 1.0 -n_layer 2 -emb_size 300 -h_size 300 -remove_models
 ```
 
 However, the following options empirically yield better embeddings at the expense of the training speed. 
 
 ```
-python train.py -data frdeen -gpuid 1 -n_layer 2 -emb_size 300 -h_size 300 -remove_models -save_dir result **-batch_size 32 -epoch_size 30  -opt_type ASGD  -learning_rate 5.0** 
+python train.py -data frdeen -gpuid 1 -save_dir result -batch_size 32 -epoch_size 30 -opt_type ASGD -learning_rate 5.0 -n_layer 2 -emb_size 300 -h_size 300 -remove_models 
 ```
 
 For the different-domain conditions (1M sentences for each language), we set the 'h_size' as 1024 in our paper. 
