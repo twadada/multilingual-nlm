@@ -48,3 +48,17 @@ python align_words.py -dict dict_path -src result/frdeen.lang0.vec -tgt result/f
 
 # Reference
 [Takashi Wada, Tomoharu Iwata, Yuji Matsumoto, Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models, The 57th Annual Meeting of the Association for Computational Linguistics (ACL), 2019](https://www.aclweb.org/anthology/P19-1300)
+```
+@inproceedings{wada-etal-2019-unsupervised,
+    title = "Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models",
+    author = "Wada, Takashi  and
+      Iwata, Tomoharu  and
+      Matsumoto, Yuji",
+    booktitle = "Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2019",
+    address = "Florence, Italy",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/P19-1300",
+    pages = "3113--3124"}
+ ```
