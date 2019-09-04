@@ -1,5 +1,5 @@
 # About
-This repository provides the code for **‘Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models’**. 
+This repository provides the code for [‘Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models’](https://www.aclweb.org/anthology/P19-1300). 
 # Dependencies
 * Python 3
 * numpy
@@ -47,7 +47,4 @@ python align_words.py -dict dict_path -src result/frdeen.lang0.vec -tgt result/f
 
 
 # Reference
-Takashi Wada, Tomoharu Iwata, Yuji Matsumoto, Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models, The 57th Annual Meeting of the Association for Computational Linguistics (ACL), 2019
-
-
-
+[Takashi Wada, Tomoharu Iwata, Yuji Matsumoto, Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models, The 57th Annual Meeting of the Association for Computational Linguistics (ACL), 2019](https://www.aclweb.org/anthology/P19-1300)
