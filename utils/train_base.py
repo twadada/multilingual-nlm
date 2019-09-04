@@ -52,15 +52,10 @@ def PAD_Sentences(model, lengths, lines_id_input, lines_id_output, index):
     for i, j in enumerate(index):
         input_line = lines_id_input[j]
         output_line = lines_id_output[j]
-
-        BOS_lines_id_input.append(model.LongTensor(
-            [model.BOS_fwd_index] + input_line + padding_len[i] * [model.PAD_index]))
-        lines_id_output_EOS.append(model.LongTensor(
-            output_line + [model.EOS_index] + padding_len[i] * [model.ignore_index]))
-        BOS_lines_id_input_bkw.append(model.LongTensor(
-            [model.BOS_bkw_index] + input_line[::-1] + padding_len[i] * [model.PAD_index]))
-        lines_id_output_EOS_bkw.append(model.LongTensor(
-            output_line[::-1] + [model.EOS_index] + padding_len[i] * [model.ignore_index]))
+        BOS_lines_id_input.append([model.BOS_fwd_index] + input_line + padding_len[i] * [model.PAD_index])
+        lines_id_output_EOS.append(output_line + [model.EOS_index] + padding_len[i] * [model.ignore_index])
+        BOS_lines_id_input_bkw.append([model.BOS_bkw_index] + input_line[::-1] + padding_len[i] * [model.PAD_index])
+        lines_id_output_EOS_bkw.append(output_line[::-1] + [model.EOS_index] + padding_len[i] * [model.ignore_index])
 
     return s_lengths, BOS_lines_id_input, lines_id_output_EOS, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw
 
@@ -133,6 +128,6 @@ class Trainer_base():
             print("loss improvement rate:",improvement_rate)
             if (improvement_rate > stop_threshold):
                 break
-
+        print("finish training")
         return model
 

@@ -35,16 +35,15 @@ class Langage_Model_Class(nn.Module):
         else:
             self.LongTensor = torch.LongTensor
 
-    def __call__(self, s_id, s_lengths, *args):
-        _, _, _, ht, softmax_score = self.lm(s_id, s_lengths, *args)
+    def __call__(self, input_id, s_lengths, *args):
+        softmax_score = self.lm(self.LongTensor(input_id), s_lengths, *args)
         return softmax_score
 
-    def Calc_loss(self,softmax_score, t_id_EOS):
+    def Calc_loss(self,softmax_score, output_id):
         #softmax_score: bs, s_len, tgtV
         #t_id_EOS: bs, s_len
-        t_id_EOS = torch.stack(t_id_EOS)
         batch_size, s_len, tgtV = softmax_score.size()
-        loss = self.cross_entropy(softmax_score.view(batch_size*s_len, tgtV), t_id_EOS.view(-1))  # (bs * maxlen_t,)
+        loss = self.cross_entropy(softmax_score.view(batch_size*s_len, tgtV), self.LongTensor(output_id).view(-1))  # (bs * maxlen_t,)
         loss = torch.sum(loss) / batch_size
         return loss
 
@@ -131,6 +130,7 @@ class Trainer():
         trainer = Trainer_base(dataset, self.opt, self.file_name)
         trainer.set_optimiser(model, self.opt.opt_type, self.opt.learning_rate)
         bestmodel = trainer.main(model, self.opt.epoch_size, self.opt.stop_threshold, self.opt.remove_models)
+        print("save embeddings")
         vocab2emb_list = Out_Wordemb(vocab_dict.id2vocab_input, bestmodel.lm)
         Save_Emb(vocab2emb_list, self.opt.emb_size, self.file_name)
 
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(parents=[global_train_parser])
     options = parser.parse_args()
     if (os.path.isdir(options.save_dir)):
-        message = options.save_dir + ' exists already.'
+        message = 'Directory ' + "'" + options.save_dir + "'" +' already exists.'
         warnings.warn(message)
     else:
         os.mkdir(options.save_dir)

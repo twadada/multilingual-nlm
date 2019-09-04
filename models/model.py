@@ -56,22 +56,18 @@ class Shared_Langage_Model(nn.Module):
         else:
             raise Exception("Invalid type")
 
-    def forward(self,BOS_t_id, t_lengths, *args):
+    def forward(self,input_id, input_id_len, *args):
 
-        t_id_emb, h_last, c_last, ht = self.decode(BOS_t_id, t_lengths, *args)
+        ht = self.decode(input_id, input_id_len, *args)
         score_V = self.Ws(self.dropout(ht))
         score_eos = self.Ws_share(self.dropout(ht))
         score = torch.cat([score_eos, score_V], dim=2)  # (bs, maxlen_t, tgtV)
+        return score
 
-        return t_id_emb, h_last, c_last, ht, score
-
-    def decode(self, t_id, t_lengths, *args):
-
-        t_id_emb = self.emb(torch.stack(t_id))  #bs, max_s_len, * emb_size
-
-        ht, (h_last, c_last) = self.lstm(t_id_emb)  # ht: bt * len_t * demb(最上位層の出力 from each hidden state)
-
-        return t_id_emb, h_last, c_last, ht
+    def decode(self, input_id, input_id_len, *args):
+        input_id_emb = self.emb(input_id)  #bs, max_s_len, * emb_size
+        ht, (h_last, c_last) = self.lstm(input_id_emb)  # ht: bt * len_t * demb(最上位層の出力 from each hidden state)
+        return  ht
 
     def set_device(self,is_cuda):
         if is_cuda:
