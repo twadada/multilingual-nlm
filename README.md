@@ -51,9 +51,7 @@ python align_words.py -dict dict_path -src result/frdeen.lang0.vec -tgt result/f
 ```
 @inproceedings{wada-etal-2019-unsupervised,
     title = "Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models",
-    author = "Wada, Takashi  and
-      Iwata, Tomoharu  and
-      Matsumoto, Yuji",
+    author = "Wada, Takashi  and Iwata, Tomoharu  and Matsumoto, Yuji",
     booktitle = "Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics",
     month = jul,
     year = "2019",
