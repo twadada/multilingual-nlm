@@ -8,13 +8,13 @@ This repository provides the code for [‘Unsupervised Multilingual Word Embeddi
 # Usage
 
 ## Preprocess
-**First, you can run preprocess.py to preprocess data before training**. For instance, you can preprocess train files `'train.fr', 'train.de' and 'train.en'` as follows:
+**First, you can run preprocess.py to preprocess data before training**. For instance, you can preprocess train files `'train.fr', 'train.de' and 'train.en'` as follows (You can increase or decrease the number of languages (train files)). 
 
 ```
 python -train train.fr train.de train.en -V_min_freq 5 5 3  -save_name frdeen
 ```
 
-**It builds vocabularies that include words used at least 5, 5, and 3 times in 'train.fr', 'train.de', and 'train.en', respectively**. This code generates in the 'data' directory `'frdeen_inputs.txt', 'frdeen.data' and 'frdeen.vocab'`, which are used for training models. Instead of the 'V_min_freq' option, you may set vocabulary sizes (-V) or feed vocabulary files (-V_files) for each language. You can also increase or decrease the number of languages (train files).
+**It builds vocabularies that include words used at least 5, 5, and 3 times in 'train.fr', 'train.de', and 'train.en', respectively**. It is highly recommended to **tokenize and lowercase your train corpora** before running this code. This code generates in the 'data' directory `'frdeen_inputs.txt', 'frdeen.data' and 'frdeen.vocab'`, and these files are used for training models. Instead of the 'V_min_freq' option, you may set vocabulary sizes (-V) or feed vocabulary files (-V_files) for each language, especially when vocabulary sizes are very large (we recommend that you keep the vocabulary sizes at most 70000 for each language. Alternatively, you may segment corpora into subwords using subword methods such as Byte-Pair-Encoding (BPE) [2], although our model is not tested on this condition. 
 
 ## Train
 **After preprocessing, you can run train.py to obtain multilingual embeddings**. Use the name of the data saved in preprocessing (frdeen) for the '-data' argument. In our paper, we used the following options for the low-resource conditions (50k sentences for each language). 
@@ -47,7 +47,9 @@ python align_words.py -dict dict_path -src result/frdeen.lang0.vec -tgt result/f
 
 
 # Reference
-[Takashi Wada, Tomoharu Iwata, Yuji Matsumoto, Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models, The 57th Annual Meeting of the Association for Computational Linguistics (ACL), 2019](https://www.aclweb.org/anthology/P19-1300)
+[1] [Takashi Wada, Tomoharu Iwata, Yuji Matsumoto, Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models, The 57th Annual Meeting of the Association for Computational Linguistics (ACL 2019)](https://www.aclweb.org/anthology/P19-1300)
+[2] [Rico Sennrich, Barry Haddow and Alexandra Birch (2016): Neural Machine Translation of Rare Words with Subword Units Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (ACL 2016)](https://www.aclweb.org/anthology/P16-1162)
+
 ```
 @inproceedings{wada-etal-2019-unsupervised,
     title = "Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models",
