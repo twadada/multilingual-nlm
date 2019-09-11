@@ -8,7 +8,7 @@ This repository provides the code for [‘Unsupervised Multilingual Word Embeddi
 # Usage
 
 ## Preprocess
-**First, you can run preprocess.py to preprocess data before training**. For instance, you can preprocess train files `'train.fr', 'train.de' and 'train.en'` as follows (You may increase or decrease the number of languages i.e. train files). 
+**First, you can run preprocess.py to preprocess data before training**. For instance, you can preprocess train files `'train.fr', 'train.de' and 'train.en'` as follows (You may increase or decrease the number of languages, i.e., train files). 
 
 ```
 python -train train.fr train.de train.en -V_min_freq 5 5 3  -save_name frdeen
