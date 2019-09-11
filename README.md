@@ -32,7 +32,7 @@ python train.py -data frdeen -gpuid 1 -save_dir result -batch_size 32 -epoch_siz
 For the different-domain conditions (1M sentences for each language), we set the 'h_size' as 1024 in our paper. 
  
 
-This code produces `'frdeen_params.txt', 'frdeen_epochX.model' (X = epoch size), and 'frdeen.lang{0,1,2,...N-1}.vec (N = number of languages)'` in the specified directory by '-save_dir'. The first text file describes the options used in train.py and preprocess.py. The second file saves trained Multilingual Neural Language Models, and **the last files are multilingual word embeddings for lang0 (fr), 1 (de), and 2 (en).**
+This code produces `'frdeen_params.txt', 'frdeen_epochX.model' (X = epoch size), and 'frdeen.lang{0,1,..,N-1}.vec (N = number of languages)'` in the specified directory by '-save_dir'. The first text file describes the options used in train.py and preprocess.py. The second file saves trained Multilingual Neural Language Models, and **the last files are multilingual word embeddings for lang0 (fr), 1 (de), and 2 (en).**
 
 
 ## Evaluation
