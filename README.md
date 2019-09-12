@@ -11,7 +11,7 @@ This repository provides the code for [‘Unsupervised Multilingual Word Embeddi
 **First, you can run preprocess.py to preprocess data before training**. It is **highly recommended to tokenize and lowercase your corpora** before running this code. You can input any number of languages, i.e., train corpora, to obtain multilingual word embeddings. For instance, you can pre-process train files `'train.fr', 'train.de' and 'train.en'` as follows. 
 
 ```
-python -train train.fr train.de train.en -V_min_freq 5 5 3  -save_name frdeen
+python preprocess.py -train train.fr train.de train.en -V_min_freq 5 5 3  -save_name frdeen
 ```
 
 **It builds vocabularies that include words used at least 5, 5, and 3 times in 'train.fr', 'train.de', and 'train.en', respectively**. This code generates `'frdeen_inputs.txt', 'frdeen.data' and 'frdeen.vocab'` in the 'data' directory, and these files are used for training models. Instead of the 'V_min_freq' option, you may set vocabulary sizes (-V) or feed vocabulary files (-V_files) for each language, especially when vocabulary sizes are very large. **We recommend that you keep the vocabulary sizes at most 70000 for each language**. Alternatively, you may reduce the vocabulary sizes using subword segmentation methods such as Byte-Pair-Encoding (BPE) [2], although our model is not tested on this condition and may not work well. 
