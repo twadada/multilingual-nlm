@@ -70,19 +70,17 @@ def check_options(opt):
             f.write(str(variable) + ": " + str(opt_dict[variable]) + "\n")
         f.close()
 
-def build_model(n_layer, emb_size, h_size, dr_rate, gpuid, Langage_Model_Class, vocab_dict):
-
-    lm = Shared_Langage_Model(n_layer, emb_size, h_size, dr_rate, vocab_dict)
-    model = Langage_Model_Class(lm, len(vocab_dict.vocab2id_input), vocab_dict.vocab2id_input[0],
-                          vocab_dict.vocab2id_output[0])
-
+def Setup_model(model, gpuid, vocab_dict):
+    #initialize params
     for param in model.parameters():
         param.data.uniform_(-0.1, 0.1)
-    ##zero embedding for padding##
+
+    ##assign zero vector for <PAD> embedding##
     model.lm.emb.weight.data[model.PAD_index] *= 0
 
     model.Register_vocab(vocab_dict.vocab2id_input, vocab_dict.vocab2id_output, vocab_dict.id2vocab_input,
                          vocab_dict.id2vocab_output)
+
     model.set_device(gpuid)
     if gpuid >= 0:
         torch.cuda.set_device(gpuid)
