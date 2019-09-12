@@ -16,3 +16,10 @@ def Sort_data_by_sentlen(dataset):
         dataset.lengths[lang] = dataset.lengths[lang][idx]
     return dataset
 
+
+def Generate_MiniBatch(dataset,batch_size):
+    #### generate mini-bathces #####
+    ####Sort by length####
+    dataset = Sort_data_by_sentlen(dataset)
+    dataset.batch_idx_list = Generate_bacth_idx(dataset, batch_size)
+    return dataset

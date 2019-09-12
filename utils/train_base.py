@@ -3,10 +3,9 @@
 
 import numpy as np
 import torch
-from torch import optim
-from torch.nn.utils import clip_grad_norm_
-import time
-import os
+import shutil
+import pickle
+from models.model import Shared_Langage_Model
 
 def Out_Wordemb(id2vocab, lm, vocab_size = 0):
     Emb = getattr(lm, "emb")  # lookup table for all languages
@@ -59,75 +58,53 @@ def PAD_Sentences(model, lengths, lines_id_input, lines_id_output, index):
 
     return s_lengths, BOS_lines_id_input, lines_id_output_EOS, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw
 
-class Trainer_base():
-    def __init__(self, dataset, opt, file_name):
-        self.dataset = dataset
-        self.file_name = file_name
-        self.cumloss_old = np.inf
-        self.cumloss_new = np.inf
+def check_options(opt):
+    np.random.seed(opt.seed)
+    print("emb_size", opt.emb_size)
+    print("hidden_size", opt.h_size)
+    ######write option to a file######
+    shutil.copy("data/" + opt.data + "_inputs.txt", opt.save_dir + '/' +opt.data + "_params.txt")
+    with open(opt.save_dir + '/' +opt.data + "_params.txt", "a") as f:
+        opt_dict = vars(opt)
+        for variable in opt_dict:
+            f.write(str(variable) + ": " + str(opt_dict[variable]) + "\n")
+        f.close()
 
-    def Update_params_base(self, model, optimizer, s_id, s_id_EOS, s_lengths,*args):
-        model.zero_grad()
-        softmax_score = model(s_id, s_lengths, *args)
-        loss = model.Calc_loss(softmax_score, s_id_EOS)
-        loss.backward()
-        clip_grad_norm_(model.parameters(), 5.0)
-        optimizer.step()
-        return loss.data.tolist()
+def build_model(n_layer, emb_size, h_size, dr_rate, gpuid, Langage_Model_Class, vocab_dict):
 
-    def Update_params(self, model, dataset, optimizer, index, *args):
+    lm = Shared_Langage_Model(n_layer, emb_size, h_size, dr_rate, vocab_dict)
+    model = Langage_Model_Class(lm, len(vocab_dict.vocab2id_input), vocab_dict.vocab2id_input[0],
+                          vocab_dict.vocab2id_output[0])
 
-        loss_all = 0
-        for lang in range(model.lang_size):
-            model.lm.Switch_Lang(lang)
-            s_lengths, BOS_lines_id_input, lines_id_output_EOS, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw = \
-                PAD_Sentences(model, dataset.lengths[lang], dataset.lines_id_input[lang],
-                                  dataset.lines_id_output[lang], index)
+    for param in model.parameters():
+        param.data.uniform_(-0.1, 0.1)
+    ##zero embedding for padding##
+    model.lm.emb.weight.data[model.PAD_index] *= 0
 
-            model.lm.Switch_fwdbkw("fwd")
-            loss_all += self.Update_params_base(model, optimizer, BOS_lines_id_input, lines_id_output_EOS, s_lengths)
+    model.Register_vocab(vocab_dict.vocab2id_input, vocab_dict.vocab2id_output, vocab_dict.id2vocab_input,
+                         vocab_dict.id2vocab_output)
+    model.set_device(gpuid)
+    if gpuid >= 0:
+        torch.cuda.set_device(gpuid)
+        model.to('cuda')
 
-            model.lm.Switch_fwdbkw("bkw")
-            loss_all += self.Update_params_base(model, optimizer, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw,
-                                           s_lengths)
-        return loss_all
+    return model
 
-    def set_optimiser(self, model, opt_type, lr_rate):
-        if opt_type == "SGD":
-            self.optimizer = optim.SGD(model.parameters(), lr=lr_rate)
-        elif opt_type == "ASGD":
-            self.optimizer = optim.ASGD(model.parameters(), lr=lr_rate)
+def load_data(data):
+    file = open("data/" + data + ".data", 'rb')
+    dataset = pickle.load(file)
 
-    def main(self,model,epoch_size, stop_threshold,remove_models =False):
+    file = open("data/" + data + ".vocab_dict", 'rb')
+    vocab_dict = pickle.load(file)
 
-        print ("epoch start")
-        old_model_name = None
-        for epoch in range(1, epoch_size+1): #for each epoch
-            print("epoch: ",epoch)
-            self.cumloss_old = self.cumloss_new
-            cumloss = 0
-            batch_idx_list = np.random.permutation(self.dataset.batch_idx_list) # shuffle batch order
-            start = time.time()
-            for bt_idx in batch_idx_list:
-                loss = self.Update_params(model, self.dataset, self.optimizer, bt_idx)
-                cumloss = cumloss + loss
-            #end of epoch
+    for i in range(dataset.lang_size):
+        print("lang: ", i)
+        print("V_size: ", vocab_dict.V_size[i])
+        print("train sents: ", len(dataset.lines_id_input[i]))
 
-            self.cumloss_new = cumloss/len(batch_idx_list)
-            elapsed_time = time.time() - start
-            print("Train elapsed_time:{0}".format(elapsed_time) + "[sec]")
-            print("loss: ",cumloss)
-            print(self.file_name +"_epoch" + str(epoch))
-            new_model_name = self.file_name + "_epoch" + str(epoch) +'.model'
-            torch.save(model.state_dict(), new_model_name)
-            if (remove_models and epoch != 1):
-                print("remove the previous model")
-                os.remove(old_model_name)
-            old_model_name = new_model_name
-            improvement_rate = self.cumloss_new / self.cumloss_old
-            print("loss improvement rate:",improvement_rate)
-            if (improvement_rate > stop_threshold):
-                break
-        print("finish training")
-        return model
+    return dataset, vocab_dict
+
+
+
+
 

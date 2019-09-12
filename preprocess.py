@@ -1,3 +1,4 @@
+import os
 import argparse
 from utils.preprocess_func import Preprocesser, Read_Corpus
 
@@ -46,6 +47,8 @@ opt = parser.parse_args()
 if __name__ == '__main__':
 
     train_corpus = Read_Corpus(opt.train)
+    if (not os.path.isdir('data')):
+        os.mkdir('data')
 
     with open("data/" + opt.save_name + "_inputs.txt", "w") as f:
         f.write("save_name" + ": " + "data/" + opt.save_name + "\n")
