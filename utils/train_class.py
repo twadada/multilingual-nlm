@@ -3,7 +3,6 @@ import torch.nn as nn
 import numpy as np
 import time
 import os
-from models.new_models import Shared_Langage_Model_W
 from utils.train_base import PAD_Sentences
 from torch.nn.utils import clip_grad_norm_
 from torch import optim
@@ -46,6 +45,7 @@ class Langage_Model_Class(nn.Module):
         self.id2vocab_input = id2vocab_input
         self.id2vocab_output = id2vocab_output
 
+
 class Trainer_base():
     def __init__(self, dataset, file_name):
         self.dataset = dataset
@@ -64,7 +64,7 @@ class Trainer_base():
         elif opt_type == "ASGD":
             self.optimizer = optim.ASGD(model.parameters(), lr=lr_rate)
 
-    def main(self,model,epoch_size, stop_threshold,remove_models =False):
+    def main(self, model, epoch_size, stop_threshold,remove_models =False):
 
         print ("epoch start")
         old_model_name = None

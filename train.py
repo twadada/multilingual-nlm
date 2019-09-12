@@ -5,9 +5,10 @@ import os
 import argparse
 from train_option import global_train_parser
 import warnings
-from utils.train_base import check_options, load_data, build_model, Out_Wordemb, Save_Emb
+from utils.train_base import check_options, load_data, Setup_model, Out_Wordemb, Save_Emb
 from utils.minibatch_processing import Generate_MiniBatch
 from utils.train_class import Langage_Model_Class, Trainer
+from models.model import Shared_Langage_Model
 
 
 if __name__ == '__main__':
@@ -29,8 +30,11 @@ if __name__ == '__main__':
     dataset = Generate_MiniBatch(dataset, opt.batch_size)
     print("Number of mini-batches", len(dataset.batch_idx_list))
 
-    model = build_model(opt.n_layer, opt.emb_size, opt.h_size,
-                        opt.dr_rate, opt.gpuid, Langage_Model_Class, vocab_dict)
+    lm = Shared_Langage_Model(opt.n_layer, opt.emb_size,  opt.h_size, opt.dr_rate, vocab_dict)
+    model = Langage_Model_Class(lm, len(vocab_dict.vocab2id_input), vocab_dict.vocab2id_input[0],
+                          vocab_dict.vocab2id_output[0])
+
+    model = Setup_model(model, opt.gpuid, vocab_dict)
 
     trainer = Trainer(dataset, file_name)
     trainer.set_optimiser(model, opt.opt_type, opt.learning_rate)
