@@ -126,29 +126,3 @@ class Trainer(Trainer_base):
             loss_all += self.Update_params_base(model, optimizer, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw,
                                                 s_lengths)
         return loss_all
-
-
-class Trainer_W(Trainer):
-    def __init__(self, dataset, file_name):
-        super().__init__(dataset, file_name)
-    def Update_params(self, model, dataset, optimizer, index, *args):
-
-        loss_all = 0
-        for lang in range(model.lang_size):
-            model.lm.Switch_Lang(lang)
-            s_lengths, BOS_lines_id_input, lines_id_output_EOS, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw = \
-                PAD_Sentences(model, dataset.lengths[lang], dataset.lines_id_input[lang],
-                                  dataset.lines_id_output[lang], index)
-
-            model.lm.Switch_fwdbkw("fwd")
-            loss_all += self.Update_params_base(model, optimizer, BOS_lines_id_input, lines_id_output_EOS, s_lengths)
-
-            model.lm.Switch_fwdbkw("bkw")
-            loss_all += self.Update_params_base(model, optimizer, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw,
-                                           s_lengths)
-            if model.orth and lang != model.lang_size-1:
-                W = model.lm.W_embedding[lang].weight.data
-                beta = 0.001
-                W.copy_((1 + beta) * W - beta * W.mm(W.transpose(0, 1).mm(W)))
-
-        return loss_all
