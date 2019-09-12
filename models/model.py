@@ -44,7 +44,8 @@ class Shared_Langage_Model(nn.Module):
 
     def Switch_Lang(self, lang):
 
-        self.Ws = self.Ws_i[lang] #switch output layer
+        self.lang = lang #switch output layer
+
 
     def Switch_fwdbkw(self,type):
         if (type == "fwd"):
@@ -59,7 +60,7 @@ class Shared_Langage_Model(nn.Module):
     def forward(self,input_id, input_id_len, *args):
 
         ht = self.decode(input_id, input_id_len, *args)
-        score_V = self.Ws(self.dropout(ht))
+        score_V = self.Ws_i[self.lang](self.dropout(ht))
         score_eos = self.Ws_share(self.dropout(ht))
         score = torch.cat([score_eos, score_V], dim=2)  # (bs, maxlen_t, tgtV)
         return score
