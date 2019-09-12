@@ -3,6 +3,7 @@ import torch.nn as nn
 import numpy as np
 import time
 import os
+from models.new_models import Shared_Langage_Model_W
 from utils.train_base import PAD_Sentences
 from torch.nn.utils import clip_grad_norm_
 from torch import optim
@@ -23,19 +24,19 @@ class Langage_Model_Class(nn.Module):
         is_cuda = gpuid >= 0
         self.lm.set_device(is_cuda)
         if is_cuda:
-            self.LongTensor = torch.cuda.LongTensor
+            self.torch = torch.cuda
         else:
-            self.LongTensor = torch.LongTensor
+            self.torch = torch
 
     def __call__(self, input_id, s_lengths, *args):
-        softmax_score = self.lm(self.LongTensor(input_id), s_lengths, *args)
+        softmax_score = self.lm(self.torch.LongTensor(input_id), s_lengths, *args)
         return softmax_score
 
     def Calc_loss(self,softmax_score, output_id):
         #softmax_score: bs, s_len, tgtV
         #t_id_EOS: bs, s_len
         batch_size, s_len, tgtV = softmax_score.size()
-        loss = self.cross_entropy(softmax_score.view(batch_size*s_len, tgtV), self.LongTensor(output_id).view(-1))  # (bs * maxlen_t,)
+        loss = self.cross_entropy(softmax_score.view(batch_size*s_len, tgtV), self.torch.LongTensor(output_id).view(-1))  # (bs * maxlen_t,)
         loss = torch.sum(loss) / batch_size
         return loss
 
@@ -124,4 +125,30 @@ class Trainer(Trainer_base):
             model.lm.Switch_fwdbkw("bkw")
             loss_all += self.Update_params_base(model, optimizer, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw,
                                                 s_lengths)
+        return loss_all
+
+
+class Trainer_W(Trainer):
+    def __init__(self, dataset, file_name):
+        super().__init__(dataset, file_name)
+    def Update_params(self, model, dataset, optimizer, index, *args):
+
+        loss_all = 0
+        for lang in range(model.lang_size):
+            model.lm.Switch_Lang(lang)
+            s_lengths, BOS_lines_id_input, lines_id_output_EOS, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw = \
+                PAD_Sentences(model, dataset.lengths[lang], dataset.lines_id_input[lang],
+                                  dataset.lines_id_output[lang], index)
+
+            model.lm.Switch_fwdbkw("fwd")
+            loss_all += self.Update_params_base(model, optimizer, BOS_lines_id_input, lines_id_output_EOS, s_lengths)
+
+            model.lm.Switch_fwdbkw("bkw")
+            loss_all += self.Update_params_base(model, optimizer, BOS_lines_id_input_bkw, lines_id_output_EOS_bkw,
+                                           s_lengths)
+            if model.orth and lang != model.lang_size-1:
+                W = model.lm.W_embedding[lang].weight.data
+                beta = 0.001
+                W.copy_((1 + beta) * W - beta * W.mm(W.transpose(0, 1).mm(W)))
+
         return loss_all
