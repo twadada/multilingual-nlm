@@ -26,7 +26,7 @@ python train.py -data frdeen -gpuid 1 -save_dir result -stop_threshold 0.99 -bat
 However, **the following options empirically yield better embeddings** at the expense of the training speed.
 
 ```
-python train.py -data frdeen -gpuid 1 -save_dir result -batch_size 32 -epoch_size 30 -opt_type ASGD -learning_rate 5.0 -n_layer 2 -emb_size 300 -h_size 300 -remove_models 
+python train.py -data frdeen -gpuid 1 -save_dir save_dir_path -batch_size 32 -epoch_size 30 -opt_type ASGD -learning_rate 5.0 -n_layer 2 -emb_size 300 -h_size 300 -remove_models 
 ```
 
 For the different-domain conditions (1M sentences for each language), we set the 'h_size' as 1024 in our paper. 
@@ -40,7 +40,7 @@ This code produces `'frdeen_params.txt', 'frdeen_epochX.model' (X = epoch size),
 **You can run align_words.py to evaluate multilingual embeddings on a word alignment task.**
 
 ```
-python align_words.py -dict dict_path -src result/frdeen.lang0.vec -tgt result/frdeen.lang1.vec -save save_name
+python align_words.py -dict dict_path -src src_vec_path -tgt tgt_vec_path -save save_name
 ```
 
 **This code aligns pairs of words in a dictionary at 'dict_path' using CSLS** and saves the result as 'save_name'. **_Note that this evaluation is different from another evaluation method called 'Bilingual Lexicon Induction'_**, which extracts the most similar target words to each source word from the whole target vocabulary. 
