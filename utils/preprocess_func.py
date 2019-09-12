@@ -160,13 +160,19 @@ class Vocab_dict():
 
 
 class Preprocesser():
-    def shuffle_train_data(self):
-        for lang in range(self.dataset.lang_size):
-            # shuffle training data
-            shuf_idx = np.random.permutation(len(self.dataset.lines_id_input[lang]))
-            self.dataset.lines_id_input[lang] = [self.dataset.lines_id_input[lang][j] for j in shuf_idx]
-            self.dataset.lines_id_output[lang] = [self.dataset.lines_id_output[lang][j] for j in shuf_idx]
-            self.dataset.lengths[lang] = self.dataset.lengths[lang][shuf_idx]
+    def shuffle_train_data(self,comparable):
+        if comparable:
+            shuf_idx = np.random.permutation(len(self.dataset.lines_id_input[0]))
+            for lang in range(self.dataset.lang_size):
+                self.dataset.lines_id_input[lang] = [self.dataset.lines_id_input[lang][j] for j in shuf_idx]
+                self.dataset.lines_id_output[lang] = [self.dataset.lines_id_output[lang][j] for j in shuf_idx]
+                self.dataset.lengths[lang] = self.dataset.lengths[lang][shuf_idx]
+        else:
+            for lang in range(self.dataset.lang_size):
+                shuf_idx = np.random.permutation(len(self.dataset.lines_id_input[lang]))
+                self.dataset.lines_id_input[lang] = [self.dataset.lines_id_input[lang][j] for j in shuf_idx]
+                self.dataset.lines_id_output[lang] = [self.dataset.lines_id_output[lang][j] for j in shuf_idx]
+                self.dataset.lengths[lang] = self.dataset.lengths[lang][shuf_idx]
 
         return self.dataset
 

@@ -41,6 +41,11 @@ parser.add_argument(
     action='store_true',
     help='output vocabulary txt file'
 )
+parser.add_argument(
+    '-comparable',
+    action='store_true',
+    help='use comparable corpora'
+)
 
 opt = parser.parse_args()
 
@@ -60,5 +65,5 @@ if __name__ == '__main__':
     Preprocesser.dataset.lines_id_input, Preprocesser.dataset.lines_id_output, Preprocesser.dataset.lengths \
         = Preprocesser.load_corpus(train_corpus)
     Preprocesser.oversampling()
-    Preprocesser.shuffle_train_data()
+    Preprocesser.shuffle_train_data(opt.comparable)
     Preprocesser.save_files(opt.save_name, opt.output_vocab)
