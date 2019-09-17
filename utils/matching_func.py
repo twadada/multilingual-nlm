@@ -71,12 +71,7 @@ def Eval_Matching(idx_sort_by_csls):
 
     return str(acc_top1),str(acc_top5),str(acc_top10)
 
-def Matching(dict_data, src_emb_path, tgt_emb_path):
-    src_vocab2emb, srcdim = Extract_vocab_emb(src_emb_path)
-    tgt_vocab2emb, tgtdim = Extract_vocab_emb(tgt_emb_path)
-
-    if srcdim!=tgtdim:
-        raise Exception("word embbedding size is different between source and target")
+def Matching(dict_data, src_vocab2emb, tgt_vocab2emb):
 
     src_word_list, tgt_word_list = Extract_vocab_dict(dict_data)
 

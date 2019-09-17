@@ -1,5 +1,5 @@
 import argparse
-from utils.matching_func import Matching
+from utils.matching_func import Matching,Extract_vocab_emb
 import os
 
 parser = argparse.ArgumentParser()
@@ -30,8 +30,13 @@ if __name__ == '__main__':
         print('tgt path: ' + opt.tgt)
     else:
         raise Exception('invalid path')
+    src_vocab2emb, srcdim = Extract_vocab_emb(opt.src)
+    tgt_vocab2emb, tgtdim = Extract_vocab_emb(opt.tgt)
 
-    p1, p5, p10= Matching(opt.dict, opt.src,opt.tgt)
+    if srcdim != tgtdim:
+        raise Exception("word embbedding size is different between source and target")
+
+    p1, p5, p10= Matching(opt.dict, src_vocab2emb, tgt_vocab2emb)
 
     print("P@1 " + p1)
     print("P@5 " + p5)
