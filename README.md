@@ -2,8 +2,8 @@
 This repository provides the code for ["Unsupervised Multilingual Word Embedding with Limited Resources using Neural Language Models"](https://www.aclweb.org/anthology/P19-1300). 
 
 
-(The code for ["Learning Contextualised Cross-lingual Word Embeddings for Extremely Low-Resource Languages Using Parallel Corpora"](https://arxiv.org/abs/2010.14649) will be published before long.)
-
+**(NOTE: The code for ["Learning Contextualised Cross-lingual Word Embeddings for Extremely Low-Resource Languages Using Parallel Corpora"](https://arxiv.org/abs/2010.14649) will be published before long.)
+**
 # Dependencies
 * Python 3
 * numpy
