@@ -48,7 +48,7 @@ python generate_dice_dict.py -files train.en-de.en train.en-de.de -save en-de_di
 ```
 However, if you have bilingual dicrionaries that you can use for model validation, it's probably better to use them rather than using those pseudo dictionaries.
 
-### Generate Subwords (Optional)
+### Prepare Subword Files (Optional)
 
 To learn subword embeddings, prepare files where **each line is "word + list of its subwords" separated by space** for each word in the vocabulary file (data/${save_name}.mono/para/multi.vocab{0,1,...}.txt).
 
@@ -84,7 +84,7 @@ where "en_subwords.txt" and "fr_subwords.txt" denote the files that contain subw
 
 #### Use Pre-trained Embeddings
 
-To use pre-trained word embeddings, set "-pretrained embedding_file.txt", where embedding_file.txt denotes a word embedding file in a word2vec format (the first line is "vocab_size  embedding_dimension", and the sebseqnet lines are "word word_vector" ). **Note that the input should be the embedding file for the targert language (e.g. French in the example above), and the embedding dimension should be the same as emb_size/h_size**. During training, the pre-trained embedding weights are freezed and words are represented by a⊙E+b, where a and b are trainable vectors. After training, the code outputs the numpy vectors a and b as "\*param_a.npy" and "\*.param_b.npy", which you may use to map pre-trained embeddings of OOV words.
+To use pre-trained word embeddings, set "-pretrained embedding_file.txt", where embedding_file.txt denotes a word embedding file in a word2vec format (the first line is "vocab_size  embedding_dimension", and the sebseqnet lines are "word word_vector" ). **Note that the input should be the embedding file for the targert language (e.g. French in the example above), and the embedding dimension should be the same as emb_size/h_size**. During training, the pre-trained embedding weights E are freezed and words are represented by a⊙E+b, where a and b are trainable vectors. After training, the code outputs the numpy vectors for a and b as "\*param_a.npy" and "\*.param_b.npy", which you may use to convert pre-trained embeddings of OOV words.
 
 
 ### Multilingual Model in [2]
