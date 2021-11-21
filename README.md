@@ -127,7 +127,7 @@ CUDA_VISIBLE_DEVICES=0 python run_alignment.py -null_align -model ${model} -GPU 
 CUDA_VISIBLE_DEVICES=0 python run_alignment.py -null_align -backward -model ${model} -GPU -src_lang 0 -tgt_lang 1 -src ${src} -tgt ${tgt} -save ${save_name}.bkw
 ```
 
-This produces forward and backward word alignments. **To combine them to generate bidirectinal alignments, use ./atools at https://github.com/clab/fast_align [4].** Omit the "-null_align" option to disable NULL alignments and acheive higher recall and lower precision (with usually lower F1). **If you align subwords, you may want to convert the subword alignments into word alignments (refer to subword2word_alignment.py for how it should be done).**
+This produces forward and backward word alignments. **To combine them to generate bidirectinal alignments, use ./atools at https://github.com/clab/fast_align [4].** Omit the "-null_align" option to disable NULL alignments and acheive higher recall and lower precision (with usually lower F1). **If you align subwords, you may want to convert the subword alignments into word alignments (if you use sentencepiece to segment words, you can use subword2word_alignment.py as shown in the next section below.).**
 
 To evaluate word alignment, use the following command if the human annotation does not distinguish sure and possible alignments and its file format is the same as the one of the prediction (e.g. 1-1 2-3 4-5).
 ```
