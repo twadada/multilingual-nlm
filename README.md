@@ -20,7 +20,7 @@ This repository contains the implementations for the following papers:
 ### Build Vocab 
 You first run preprocess.py to preprocess data. It is **highly recommended to tokenize and lowercase your corpora (+ subword segmentation if the data is large and your goal is to obtain word alignments)** before running this code. You can input two or more languages to obtain multilingual word embeddings. 
 
-If you have monolingual data only (of syntacticaly similar languages), e.g. train.en/train.fr/train.de, run the following command:
+* **If you have monolingual data only (of syntacticaly similar languages)**, e.g. train.en/train.fr/train.de, run the following command:
 ```
 en_minfreq=1
 fr_minfreq=1
@@ -29,11 +29,11 @@ save_name=enfrde
 
 python preprocess.py -mono train.en train.fr train.de -V_min_freq ${en_minfreq} ${fr_minfreq} ${de_minfreq} -save_name ${save_name} -output_vocab
 ```
-If you have one parallel data, e.g. train.en-fr.{en/fr}, run the following command:
+* **If you have one parallel data**, e.g. train.en-fr.{en/fr}, run the following command:
 ```
 python preprocess.py -para train.en-fr.en train.en-fr.fr -V_min_freq ${en_minfreq} ${fr_minfreq} -save_name ${save_name} -output_vocab
 ```
-If you have two or more parallel data where one language (e.g. English) is aligned with the other langauges, e.g. train.en-fr.{en/fr}, train.en-de.{en/de}, run the following command:
+* **If you have two or more parallel data where one language (e.g. English) is aligned with the other langauges**, e.g. train.en-fr.{en/fr}, train.en-de.{en/de}, run the following command:
 ```
 python preprocess.py -multi train.en-fr.en train.en-de.en train.en-fr.fr train.en-de.de -V_min_freq ${en_minfreq} ${fr_minfreq} ${de_minfreq} -save_name ${save_name} -output_vocab
 ```
