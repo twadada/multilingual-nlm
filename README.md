@@ -10,7 +10,7 @@ This repository contains the implementations for the following papers:
 # Dependencies
 * Python 3
 * numpy
-* torch (>=1.0.1)
+* torch (>=1.0.1); tested on 1.7.1/1.8.1
 * tqdm
 * sentencepiece (optional)
 
