@@ -11,6 +11,7 @@ This repository contains the implementations for the following papers:
 * Python 3
 * numpy
 * torch (>=1.0.1)
+* tqdm
 * sentencepiece (optional)
 
 # Usage
