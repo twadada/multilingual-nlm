@@ -138,7 +138,7 @@ If the format of the human annotation is "sent_id src_word_id tgt_word_id Sure/P
 python calc_AER.py  -pred ${prediction} -gold ${gold}  -save save_name -line_by_line
 ```
 
-## Reproduce the De-En word alignment experiment
+## Reproduce the De-En word alignment experiment in [2]
 
 1. Download and preprocess de-en training and test data using the code at https://github.com/lilt/alignment-scripts (alignment-scripts)
 2. Run the commands below
