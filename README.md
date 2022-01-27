@@ -70,16 +70,16 @@ To obtain cross-lingual word embeddings using "enfr.para", run the following com
 
 ```
 save_dir=Result
-CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -share_vocab 0 -eval_dict en-fr_dict.txt -seed 0 -dr_rate 0.5 -epoch_size 200 -opt_type Adam -save_dir ${save_dir} -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
+CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -lang_class 0 1 -share_vocab 0 -eval_dict en-fr_dict.txt -seed 0 -dr_rate 0.5 -epoch_size 200 -opt_type Adam -save_dir ${save_dir} -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
 ```
  
-This command produces cross-lingual word embeddings "enfr.para.lang{0,1}.vec" in ${save_dir} directory. It also produces the best model "${data}_epochX.bestmodel", which you can use to perform word alignments or generate contextualised word embeddings. To use multiple GPUs, specify multiple GPU ids at CUDA_VISIBLE_DEVICES (but the implementation gets computationally less efficient). To share the decoders among different languages (which may work better for syntactically close languages such as English and French), set "-class_number 0 0".
+This command produces cross-lingual word embeddings "enfr.para.lang{0,1}.vec" in ${save_dir} directory. It also produces the best model "${data}_epochX.bestmodel", which you can use to perform word alignments or generate contextualised word embeddings. To use multiple GPUs, specify multiple GPU ids at CUDA_VISIBLE_DEVICES (but the implementation gets computationally less efficient). To share the decoders among different languages (which may work better for syntactically close languages such as English and French), set "-lang_class 0 0".
 
 #### Learn Subword-Aware Embeddings
 
 To train subword-aware word embeddings, add "-share_vocab" and "-subword" options as follows:
 ```
-CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -share_vocab 3 -subword en_subwords.txt fr_subwords.txt -eval_dict en-fr_dict.txt -seed 2 -dr_rate 0.5 -epoch_size 200 -opt_type Adam -save_dir ${save_dir} -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
+CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -lang_class 0 1 -share_vocab 3 -subword en_subwords.txt fr_subwords.txt -eval_dict en-fr_dict.txt -seed 2 -dr_rate 0.5 -epoch_size 200 -opt_type Adam -save_dir ${save_dir} -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
 ```
 where "en_subwords.txt" and "fr_subwords.txt" denote the files that contain subword information for each word in the vocabulary. The option "-share_vocab 3" denotes training the average-pooling model; for the CNN model, use "-share_vocab 4" instead (however, this model is scalable only on extremely low-resource data). If you have applied subword segmentaion to the training corpora, you do not have to learn subword-aware embeddings (but you can learn "subsubword" embeddings in the same way, which would be effective for some languages, e.g. Japanese, Chinese).
 
@@ -92,11 +92,11 @@ To use pre-trained word embeddings, **set "-pretrained embedding_file.txt", wher
 To generate multilingual word embeddings using "enfrde.multi", feed N-1 (psuedo) dictionaries for "-eval_dict" (and N subword files for -subword if you use subwords) where N is the number of languages. Note that the order of the language pairs should be consistent between "-eval_dict" in train.py and "-multi" in preprocess.py (e.g. en-fr, en-de). The following command trains the model that learns subword-aware multilingual word embeddings using average pooling (to disable subwords embeddings, remove -share_vocab and -subword options).
 
 ```
-CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfrde.multi -share_vocab 3 -subword en_subwords.txt fr_subwords.txt de_subwords.txt -eval_dict en-fr_dict.txt en-de_dict.txt -seed 2 -dr_rate 0.5 -epoch_size 100 -opt_type Adam -save_dir Result -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
+CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfrde.multi -lang_class 0 1 2 -share_vocab 3 -subword en_subwords.txt fr_subwords.txt de_subwords.txt -eval_dict en-fr_dict.txt en-de_dict.txt -seed 2 -dr_rate 0.5 -epoch_size 100 -opt_type Adam -save_dir Result -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
 ```
 
 ### Fully Unsupervised Model in [1]
-**To generate multilingual word embeddings using "enfrde.mono", simply replace "-data enfrde.multi" above with "-data enfrde.mono"; set -class_number 0 0 0 (this means sharing one decoder among three languages); and omit "-eval_dict"** (but if you have dictionaries, you can still use them in the same way as described above). You can also train subword-aware embeddings using the subword option and that may yield better performance, although this is not proposed in the original paper [1]. Note that this model does not have an encoder.
+**To generate multilingual word embeddings using "enfrde.mono", simply replace "-data enfrde.multi" above with "-data enfrde.mono"; set "-lang_class 0 0 0" (this means sharing one decoder among three languages); and omit "-eval_dict"** (but if you have dictionaries, you can still use them in the same way as described above). You can also train subword-aware embeddings using the subword option and that may yield better performance, although this is not proposed in the original paper [1]. Note that this model does not have an encoder.
 
 ### Tips for Hyper-parameters
 The most important hyper-parameters that significantly affect the performance are -epoch_size, -emb_size/h_size, -batch_size, -dr_rate, and -enc_dec_layer. One rule of thumb is that **the larger the vocabulary size, the larger the embedding size should be**. In our paper [2], we set the embedding size to 500 for small data (300 ~ 300k parallel sents) with the vocabulary size < 20k, and to 768 for large data (~ 2M parallel sents) with the vocabulary size < 35k. Also, **larger training data requires the larger batch_size/enc_dec_layer and smaller epoch_size/save_point. (refer to [2] for the details)**. If you want to reduce the embedding size, you should reduce the dropout rate to 0.1 ~ 0.3, although this may lead to poorer performance on BLI/word alignments.
@@ -156,7 +156,7 @@ python generate_dice_dict.py -files $de.filtered $en.filtered -save de-en_dict.t
 
 # train a de-en model
 save_dir=de-en_result
-CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -eval_dict de-en_dict.txt -seed 0 -dr_rate 0.5 -epoch_size 10 -opt_type Adam -save_dir ${save_dir} -batch_size 80 -enc_dec_layer 3 2 -emb_size 768 -h_size 768  -remove_models -save_point 1
+CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -lang_class 0 1 -eval_dict de-en_dict.txt -seed 0 -dr_rate 0.5 -epoch_size 10 -opt_type Adam -save_dir ${save_dir} -batch_size 80 -enc_dec_layer 3 2 -emb_size 768 -h_size 768  -remove_models -save_point 1
 
 # Perform alignments
 src=${data_dir}/test/deen.lc.src.bpe
