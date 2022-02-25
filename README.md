@@ -8,7 +8,7 @@ This repository contains the implementations for the following papers:
 **(NOTE) The performance of the unsupervised method in [1] has improved with the techniques used in [2] (e.g. weight tying, shared subword embeddings)**
 
 # Dependencies
-* Python 3
+* Python 3 (tested on 3.6.10)
 * numpy
 * torch (>=1.0.1); tested on 1.7.1/1.8.1
 * tqdm
