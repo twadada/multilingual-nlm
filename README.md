@@ -156,7 +156,7 @@ python generate_dice_dict.py -files $de.filtered $en.filtered -save de-en_dict.t
 
 # train a de-en model
 save_dir=de-en_result
-CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -lang_class 0 1 -eval_dict de-en_dict.txt -seed 0 -dr_rate 0.5 -epoch_size 10 -opt_type Adam -save_dir ${save_dir} -batch_size 80 -enc_dec_layer 3 2 -emb_size 768 -h_size 768  -remove_models -save_point 1
+CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data de-en.para -lang_class 0 1 -eval_dict de-en_dict.txt -seed 0 -dr_rate 0.5 -epoch_size 10 -opt_type Adam -save_dir ${save_dir} -batch_size 80 -enc_dec_layer 3 2 -emb_size 768 -h_size 768  -remove_models -save_point 1
 
 # Perform alignments
 src=${data_dir}/test/deen.lc.src.bpe
