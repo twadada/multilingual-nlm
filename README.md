@@ -39,7 +39,7 @@ python preprocess.py -multi train.en-fr.en train.en-de.en train.en-fr.fr train.e
 ```
 (Similarly, if you have three parallel data: en1-X, en2-Y, and en3-Z, the input of -multi should be "en1 en2 en3 X Y Z"')
 
-**These commands generate the files whose names start with "${save_name}.{mono/para/multi}", which are used in the subsequent steps.** The option "-V_min_freq 1" means all the words in the data are included in the vocabulary, but if the data is very large and not segmented into subwords in advance, you should set -V_min_freq higher to adjust the vocab size (< 40~50k). You can also use '-V' option to directly set the vocabulary size, or feed the vocabulary files (-V_files) for each language. 
+**These commands generate the files whose names start with "${save_name}.{mono/para/multi}", which are used in the subsequent steps.** The option "-V_min_freq 1" means all the words in the data are included in the vocabulary, but if the data is very large and words not pre-tokenised into subwords, you should set -V_min_freq higher to adjust the vocab size (e.g. 40~50k). You can also use '-V' option to directly set the vocabulary size, or feed the vocabulary files (-V_files) for each language. 
 
 ### Extract Pseudo Dictionaries from Parallel Data (used for [2])
 If you use parallel data, you can generate pseudo dictionaries based on Dice coefficient, and use them for model selection. 
@@ -58,7 +58,7 @@ To learn subword embeddings, prepare files where **each line is "word + list of 
 understandable ▁under stand able" <br>
 plays ▁play s 
 
-In this example, the embeddings of the subwords (e.g. "▁under", "stand", "able") are shared among all the input languages. To obtain subwords, you may learn a SentencePiece model [3] (https://github.com/google/sentencepiece) on training corpora (either jointly or separately for each language) and apply the model to the vocabulary file as follows (data/enfrde.para.vocab0.txt.):
+In this example, the embeddings of the subwords ("▁under", "stand", "able", "▁play", "s") are shared among all the input languages. To obtain subwords, you may train a SentencePiece model [3] (https://github.com/google/sentencepiece) on the training data (either jointly or separately for each language) and apply the model to the vocabulary file as follows (data/enfrde.para.vocab0.txt.):
 
 ```
 python generate_subwords.py -vocab_file data/enfr.para.vocab0.txt -spm_model path_to_spm_model -out en_subwords.txt
@@ -66,14 +66,14 @@ python generate_subwords.py -vocab_file data/enfr.para.vocab0.txt -spm_model pat
 
 ## Train
 ### Bilingual Model in [2]
-To obtain cross-lingual word embeddings using "enfr.para", run the following command (the hyper-parameters are set to the ones used in low-resource experiments in [2]). **Note that the model performance can be somewhat unstable when trained on very small data; this is because the training is performed in an "unsupervised" way in that the model does not employ any cross-lingual supervision at a word level.**
+To obtain cross-lingual word embeddings using "enfr.para", run the following command (the specified hyper-parameters are used in our low-resource experiments in [2]). **Note that the model performance can be somewhat unstable when trained on very small data; this is because the training is performed in an "unsupervised" way (i.e. the model does not employ any cross-lingual supervision at a word level).**
 
 ```
 save_dir=Result
 CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -lang_class 0 1 -share_vocab 0 -eval_dict en-fr_dict.txt -seed 0 -dr_rate 0.5 -epoch_size 200 -opt_type Adam -save_dir ${save_dir} -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
 ```
  
-This command produces cross-lingual word embeddings "enfr.para.lang{0,1}.vec" in ${save_dir} directory. It also produces the best model "${data}_epochX.bestmodel", which you can use to perform word alignments or generate contextualised word embeddings. To use multiple GPUs, specify multiple GPU ids at CUDA_VISIBLE_DEVICES (but the implementation gets computationally less efficient). To share the decoders among different languages (which may work better for syntactically close languages such as English and French), set "-lang_class 0 0".
+This command produces cross-lingual word embeddings "enfr.para.lang0/1.vec" in ${save_dir} directory. It also produces the best model "*epochX.bestmodel", which you can use to perform word alignments or generate contextualised word embeddings. You can also use multiple GPUs by specifying multiple GPU ids at CUDA_VISIBLE_DEVICES (but with less efficient implementation). You can share the decoders among different languages by replacing "-lang_class 0 1" with "-lang_class 0 0" (which might work better for syntactically close languages such as English and French), 
 
 #### Learn Subword-Aware Embeddings
 
@@ -81,15 +81,15 @@ To train subword-aware word embeddings, add "-share_vocab" and "-subword" option
 ```
 CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfr.para -lang_class 0 1 -share_vocab 3 -subword en_subwords.txt fr_subwords.txt -eval_dict en-fr_dict.txt -seed 2 -dr_rate 0.5 -epoch_size 200 -opt_type Adam -save_dir ${save_dir} -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
 ```
-where "en_subwords.txt" and "fr_subwords.txt" denote the files that contain subword information for each word in the vocabulary. The option "-share_vocab 3" denotes training the average-pooling model; for the CNN model, use "-share_vocab 4" instead (however, this model is scalable only on extremely low-resource data). If you have applied subword segmentaion to the training corpora, you do not have to learn subword-aware embeddings (but you can learn "subsubword" embeddings in the same way, which would be effective for some languages, e.g. Japanese, Chinese).
+where "en_subwords.txt" and "fr_subwords.txt" denote the files that contain subword information for each word in the vocabulary. The option "-share_vocab 3" denotes training the average-pooling model; for the CNN model, use "-share_vocab 4" instead (however, this model is scalable only on extremely low-resource data). If you have applied subword segmentaion to the training corpora, you do not have to learn subword-aware embeddings (but you can opt to learn "subsubword" embeddings in the same way, which would be effective for some languags where each character contains much information, like Japanese, Chinese).
 
 #### Use Pre-trained Embeddings
 
-To use pre-trained word embeddings, **set "-pretrained embedding_file.txt", where embedding_file.txt denotes a word embedding file in a word2vec format** (the first line is "vocab_size  embedding_dimension", and the sebseqnet lines are "word word_vector" ). **Note that the input should be the embedding file for the targert language (e.g. French in the example above), and the embedding dimension should be the same as emb_size/h_size**. During training, the pre-trained embedding weights E are freezed and words are represented by a⊙E+b, where a and b are trainable vectors. After training, the code outputs the numpy vectors for a and b as "\*param_a.npy" and "\*.param_b.npy", which you may use to convert pre-trained embeddings of OOV words.
+To use pre-trained word embeddings, **set "-pretrained embedding_file.txt", where embedding_file.txt denotes a word embedding file in a word2vec format** (the first line is "vocab_size  embedding_dimension", and the sebseqnet lines are "word vector" ). **Note that the input should be the embedding file for the targert language (e.g. French in the example above), and the embedding dimension should be the same as emb_size/h_size**. During training, **the pre-trained embedding weights E are freezed** and **words are represented by a⊙E+b, where a and b are trainable vectors.** After training, the code outputs the numpy vectors for a and b as "\*param_a.npy" and "\*.param_b.npy", which you can use to map the pre-trained embeddings of OOVs into the same space.
 
 
 ### Multilingual Model in [2]
-To generate multilingual word embeddings using "enfrde.multi", feed N-1 (psuedo) dictionaries for "-eval_dict" (and N subword files for -subword if you use subwords) where N is the number of languages. Note that the order of the language pairs should be consistent between "-eval_dict" in train.py and "-multi" in preprocess.py (e.g. en-fr, en-de). The following command trains the model that learns subword-aware multilingual word embeddings using average pooling (to disable subwords embeddings, remove -share_vocab and -subword options).
+To generate multilingual word embeddings using "enfrde.multi", feed N-1 (psuedo) dictionaries for "-eval_dict" (and N subword files for -subword if you use subwords) where N is the number of the input languages. Note that the order of the language pairs must be consistent across "-eval_dict" in train.py and "-multi" in preprocess.py (e.g. en-fr, en-de). The following command trains the model that learns subword-aware multilingual word embeddings using average pooling (to disable subwords embeddings, remove -share_vocab and -subword options).
 
 ```
 CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfrde.multi -lang_class 0 1 2 -share_vocab 3 -subword en_subwords.txt fr_subwords.txt de_subwords.txt -eval_dict en-fr_dict.txt en-de_dict.txt -seed 2 -dr_rate 0.5 -epoch_size 100 -opt_type Adam -save_dir Result -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
@@ -98,10 +98,10 @@ CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfrde.multi -lang_class 0 1 2
 ### Fully Unsupervised Model in [1]
 **To generate multilingual word embeddings using "enfrde.mono", simply replace "-data enfrde.multi" above with "-data enfrde.mono"; set "-lang_class 0 0 0" (this means sharing one decoder among three languages); and omit "-eval_dict"** (but if you have dictionaries, you can still use them in the same way as described above). You can also train subword-aware embeddings using the subword option and that may yield better performance, although this is not proposed in the original paper [1]. Note that this model does not have an encoder.
 
-### Tips for Hyper-parameters
-The most important hyper-parameters that significantly affect the performance are -epoch_size, -emb_size/h_size, -batch_size, -dr_rate, and -enc_dec_layer. One rule of thumb is that **the larger the vocabulary size, the larger the embedding size should be**. In our paper [2], we set the embedding size to 500 for small data (300 ~ 300k parallel sents) with the vocabulary size < 20k, and to 768 for large data (~ 2M parallel sents) with the vocabulary size < 35k. Also, **larger training data requires the larger batch_size/enc_dec_layer and smaller epoch_size/save_point. (refer to [2] for the details)**. If you want to reduce the embedding size, you should reduce the dropout rate to 0.1 ~ 0.3, although this may lead to poorer performance on BLI/word alignments.
+### (Important) Tips for Hyper-parameters 
+The most relevant hyper-parameters that significantly affect the model performance are -epoch_size, -emb_size/h_size, -batch_size, -dr_rate, and -enc_dec_layer. One rule of thumb is that **the larger the vocabulary size becomes, the larger the emb/h size should be**. In our paper [2], we set the embedding size to 500 for small data (100s ~ 300k parallel sents) with the vocabulary size < 20k; and to 768 for large data (~ 2M parallel sents) with the vocabulary size < 35k. Also, **larger training data requires larger batch_size/enc_dec_layer and smaller epoch_size/save_point. (refer to [2] for the details)**. If you want to reduce the embedding size, you should reduce the dropout rate to 0.1 ~ 0.3 (but this may lead to poorer performance on BLI/word alignments).
 
-To know whether the training of the model in [2] has been successful, you can check the BLI performance on psuedo dictionaries — if P@1 is below 80~90%, it is very likely that either the hyper-parameters are not optimal, or the training data is very noisy. Also, if current_loss/previous_loss is below 0.99 when the training is done, you should probably increase the epoch size and train the model longer to ensure convergence.
+To see whether the training of the model in [2] has been successful, you can check the BLI performance on psuedo dictionaries — if P@1 is below 80~90%, it is very likely that either some of the hyper-parameters are not well-tuned, or the training data is very noisy. Also, if current_loss/previous_loss is below 0.99 when the training is done, you should probably increase the epoch size and train the model longer to ensure convergence.
 
 ## Evaluation
 
@@ -127,7 +127,7 @@ CUDA_VISIBLE_DEVICES=0 python run_alignment.py -null_align -model ${model} -GPU 
 CUDA_VISIBLE_DEVICES=0 python run_alignment.py -null_align -backward -model ${model} -GPU -src_lang 0 -tgt_lang 1 -src ${src} -tgt ${tgt} -save ${save_name}.bkw
 ```
 
-This produces forward and backward word alignments. **To combine them to generate bidirectinal alignments, use ./atools at https://github.com/clab/fast_align [4].** Omit the "-null_align" option to disable NULL alignments and acheive higher recall and lower precision (with usually lower F1). **If you align subwords, you may want to convert the subword alignments into word alignments (if you use sentencepiece to segment words, you can use subword2word_alignment.py as shown in the next section below.).**
+This produces forward and backward word alignments. **To combine them to generate bidirectinal alignments, use ./atools at https://github.com/clab/fast_align [4].** Omit the "-null_align" option to disable NULL alignments and acheive higher recall and lower precision (with usually lower F1). **If you aligned subwords, you should convert them into word alignments, and if you used SentencePiece to segment words, you can use subword2word_alignment.py as shown in the next section below.).**
 
 To evaluate word alignment, use the following command if the human annotation does not distinguish sure and possible alignments and its file format is the same as the one of the prediction (e.g. 1-1 2-3 4-5).
 ```
