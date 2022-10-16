@@ -89,7 +89,7 @@ To use pre-trained word embeddings, **set "-pretrained embedding_file.txt", wher
 
 
 ### Multilingual Model in [2]
-To generate multilingual word embeddings using "enfrde.multi", feed N-1 (psuedo) dictionaries for "-eval_dict" (and N subword files for -subword if you use subwords) where N is the number of the input languages. Note that the order of the language pairs must be consistent across "-eval_dict" in train.py and "-multi" in preprocess.py (e.g. en-fr, en-de). The following command trains the model that learns subword-aware multilingual word embeddings using average pooling (to disable subwords embeddings, remove -share_vocab and -subword options).
+To generate multilingual word embeddings using "enfrde.multi", feed N-1 (pseudo) dictionaries for "-eval_dict" (and N subword files for -subword if you use subwords) where N is the number of the input languages. Note that the order of the language pairs must be consistent across "-eval_dict" in train.py and "-multi" in preprocess.py (e.g. en-fr, en-de). The following command trains the model that learns subword-aware multilingual word embeddings using average pooling (to disable subwords embeddings, remove -share_vocab and -subword options).
 
 ```
 CUDA_VISIBLE_DEVICES=0 python train.py -gpu -data enfrde.multi -lang_class 0 1 2 -share_vocab 3 -subword en_subwords.txt fr_subwords.txt de_subwords.txt -eval_dict en-fr_dict.txt en-de_dict.txt -seed 2 -dr_rate 0.5 -epoch_size 100 -opt_type Adam -save_dir Result -batch_size 16 -enc_dec_layer 1 1 -emb_size 500 -h_size 500  -remove_models -save_point 10
